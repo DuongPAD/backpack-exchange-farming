@@ -47,7 +47,8 @@ const init = async (client) => {
         console.log(`Số lần mua thành công:${successBuy}, Số lần bán thành công:${successSell}`);
         console.log(getNowFormatDate(), "Đang lấy thông tin tài khoản...");
         let userBalance = await client.Balance();
-        await sleep(30000);
+        let randomNumber = Math.floor(Math.random() * (900000 - 60000 + 1)) + 60000;
+        await sleep(randomNumber);
         // Kiểm tra số dư USDC trong tài khoản có lớn hơn 5 không
         console.log('userBalance', userBalance);
 
@@ -60,7 +61,8 @@ const init = async (client) => {
     } catch (e) {
         init(client);
         console.log(getNowFormatDate(), "Đặt hàng thất bại, đang thử lại...");
-        await sleep(10000);
+        let randomSleepNumber = Math.floor(Math.random() * (600000 - 60000 + 1)) + 60000;
+        await sleep(randomSleepNumber);
     }
 }
 
@@ -122,7 +124,7 @@ const buyOrder = async (client) => {
     console.log(getNowFormatDate(), "Giá thị trường hiện tại của sol_usdc:", lastPrice);
     console.log(getNowFormatDate(), `Đang mua... Sử dụng ${(userBalance.USDC.available - 2).toFixed(2).toString()} USDC để mua SOL`);
     let amount = ((userBalance.USDC.available - 2) / lastPrice).toFixed(2).toString();
-    console.log("1024", amount);
+    console.log("USDC amount: ", amount);
     let orderResultBid = await client.ExecuteOrder({
         orderType: "Limit",
         price: lastPrice.toString(),
