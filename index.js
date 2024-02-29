@@ -52,7 +52,7 @@ const init = async (client) => {
         // Kiểm tra số dư USDC trong tài khoản có lớn hơn 5 không
         console.log('userBalance', userBalance);
 
-        if (userBalance.USDC.available > 5) {
+        if (userBalance && userBalance.USDC && userBalance.USDC.available > 5) {
             await buyOrder(client);
         } else {
             await sellOrder(client);
