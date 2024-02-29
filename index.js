@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const backpack_client_1 = require("./backpack_client");
 require('dotenv').config();
 
-function delay(ms) {
+function sleep(ms) {
     return new Promise(resolve => {
         setTimeout(resolve, ms);
     });
@@ -11,8 +11,8 @@ function delay(ms) {
 
 function getNowFormatDate() {
     var date = new Date();
-    var seperator1 = "-";
-    var seperator2 = ":";
+    var separatorType1 = "-";
+    var separatorType2 = ":";
     var month = date.getMonth() + 1;
     var strDate = date.getDate();
     var strHour = date.getHours();
@@ -33,40 +33,39 @@ function getNowFormatDate() {
     if (strSecond >= 0 && strSecond <= 9) {
         strSecond = "0" + strSecond;
     }
-    var currentdate = date.getFullYear() + seperator1 + month + seperator1 + strDate
-        + " " + strHour + seperator2 + strMinute
-        + seperator2 + strSecond;
-    return currentdate;
+    var currentDate = date.getFullYear() + separatorType1 + month + separatorType2 + strDate
+        + " " + strHour + separatorType2 + strMinute
+        + separatorType2 + strSecond;
+    return currentDate;
 }
 
-let successbuy = 0;
-let sellbuy = 0;
+let successBuy = 0;
+let successSell = 0;
 
 const init = async (client) => {
     try {
-        console.log(`Số lần mua thành công:${successbuy}, Số lần bán thành công:${sellbuy}`);
+        console.log(`Số lần mua thành công:${successBuy}, Số lần bán thành công:${successSell}`);
         console.log(getNowFormatDate(), "Đang lấy thông tin tài khoản...");
-        let userbalance = await client.Balance();
-        await delay(30000);
+        let userBalance = await client.Balance();
+        await sleep(30000);
         // Kiểm tra số dư USDC trong tài khoản có lớn hơn 5 không
-        console.log('userbalance', userbalance);
+        console.log('userBalance', userBalance);
 
-        if (userbalance.USDC.available > 5) {
-            await buyfun(client);
+        if (userBalance.USDC.available > 5) {
+            await buyOrder(client);
         } else {
-            await sellfun(client);
+            await sellOrder(client);
             return;
         }
     } catch (e) {
         init(client);
         console.log(getNowFormatDate(), "Đặt hàng thất bại, đang thử lại...");
-        await delay(10000);
+        await sleep(10000);
     }
 }
 
 
-
-const sellfun = async (client) => {
+const sellOrder = async (client) => {
     // Hủy tất cả các đơn đặt hàng chưa hoàn thành
     let GetOpenOrders = await client.GetOpenOrders({ symbol: "SOL_USDC" });
     if (GetOpenOrders.length > 0) {
@@ -77,18 +76,18 @@ const sellfun = async (client) => {
     }
     console.log(getNowFormatDate(), "Đang lấy thông tin tài khoản...");
     // Lấy thông tin tài khoản
-    let userbalance2 = await client.Balance();
-    console.log(getNowFormatDate(), "Thông tin tài khoản:", userbalance2);
+    let userBalance2 = await client.Balance();
+    console.log(getNowFormatDate(), "Thông tin tài khoản:", userBalance2);
     console.log(getNowFormatDate(), "Đang lấy giá thị trường hiện tại của sol_usdc...");
     // Lấy giá hiện tại
-    let { lastPrice: lastPriceask } = await client.Ticker({ symbol: "SOL_USDC" });
-    console.log(getNowFormatDate(), "Giá thị trường hiện tại của sol_usdc:", lastPriceask);
-    let quantitys = ((userbalance2.SOL.available / 2) - 0.02).toFixed(2).toString();
-    console.log(getNowFormatDate(), `Đang bán... Bán ${quantitys} SOL`);
+    let { lastPrice: currentPrice } = await client.Ticker({ symbol: "SOL_USDC" });
+    console.log(getNowFormatDate(), "Giá thị trường hiện tại của sol_usdc:", currentPrice);
+    let amount = ((userBalance2.SOL.available / 2) - 0.02).toFixed(2).toString();
+    console.log(getNowFormatDate(), `Đang bán... Bán ${amount} SOL`);
     let orderResultAsk = await client.ExecuteOrder({
         orderType: "Limit",
-        price: lastPriceask.toString(),
-        quantity: quantitys,
+        price: currentPrice.toString(),
+        quantity: amount,
         side: "Ask", // Bán
         symbol: "SOL_USDC",
         timeInForce: "IOC"
@@ -96,7 +95,7 @@ const sellfun = async (client) => {
 
     if (orderResultAsk?.status == "Filled" && orderResultAsk?.side == "Ask") {
         console.log(getNowFormatDate(), "Bán thành công");
-        sellbuy += 1;
+        successSell += 1;
         console.log(getNowFormatDate(), "Chi tiết đơn hàng:", `Giá bán:${orderResultAsk.price}, Số lượng bán:${orderResultAsk.quantity}, Mã đơn hàng:${orderResultAsk.id}`);
         init(client);
     } else {
@@ -104,37 +103,37 @@ const sellfun = async (client) => {
         throw new Error("Bán thất bại");
     }
 }
-const buyfun = async (client) => {
+const buyOrder = async (client) => {
     // Hủy tất cả các đơn đặt hàng chưa hoàn thành
     let GetOpenOrders = await client.GetOpenOrders({ symbol: "SOL_USDC" });
     if (GetOpenOrders.length > 0) {
-        let CancelOpenOrders = await client.CancelOpenOrders({ symbol: "SOL_USDC" });
+        await client.CancelOpenOrders({ symbol: "SOL_USDC" });
         console.log(getNowFormatDate(), "Hủy tất cả các đơn đặt hàng");
     } else {
         console.log(getNowFormatDate(), "Tài khoản đặt hàng bình thường, không cần hủy đơn đặt hàng");
     }
     console.log(getNowFormatDate(), "Đang lấy thông tin tài khoản...");
     // Lấy thông tin tài khoản
-    let userbalance = await client.Balance();
-    console.log(getNowFormatDate(), "Thông tin tài khoản:", userbalance);
+    let userBalance = await client.Balance();
+    console.log(getNowFormatDate(), "Thông tin tài khoản:", userBalance);
     console.log(getNowFormatDate(), "Đang lấy giá thị trường hiện tại của sol_usdc...");
     // Lấy giá hiện tại
     let { lastPrice } = await client.Ticker({ symbol: "SOL_USDC" });
     console.log(getNowFormatDate(), "Giá thị trường hiện tại của sol_usdc:", lastPrice);
-    console.log(getNowFormatDate(), `Đang mua... Sử dụng ${(userbalance.USDC.available - 2).toFixed(2).toString()} USDC để mua SOL`);
-    let quantitys = ((userbalance.USDC.available - 2) / lastPrice).toFixed(2).toString();
-    console.log("1024", quantitys);
+    console.log(getNowFormatDate(), `Đang mua... Sử dụng ${(userBalance.USDC.available - 2).toFixed(2).toString()} USDC để mua SOL`);
+    let amount = ((userBalance.USDC.available - 2) / lastPrice).toFixed(2).toString();
+    console.log("1024", amount);
     let orderResultBid = await client.ExecuteOrder({
         orderType: "Limit",
         price: lastPrice.toString(),
-        quantity: quantitys,
+        quantity: amount,
         side: "Bid", // Mua
         symbol: "SOL_USDC",
         timeInForce: "IOC"
     })
     if (orderResultBid?.status == "Filled" && orderResultBid?.side == "Bid") {
         console.log(getNowFormatDate(), "Đặt hàng thành công");
-        successbuy += 1;
+        successBuy += 1;
         console.log(getNowFormatDate(), "Chi tiết đơn hàng:", `Giá mua:${orderResultBid.price}, Số lượng mua:${orderResultBid.quantity}, Mã đơn hàng:${orderResultBid.id}`);
         init(client);
     } else {
