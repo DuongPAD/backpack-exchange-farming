@@ -47,7 +47,7 @@ const init = async (client) => {
         console.log(`Số lần mua thành công:${successBuy}, Số lần bán thành công:${successSell}`);
         console.log(getNowFormatDate(), "Đang lấy thông tin tài khoản...");
         let userBalance = await client.Balance();
-        let randomNumber = Math.floor(Math.random() * (900000 - 60000 + 1)) + 60000;
+        let randomNumber = Math.floor(Math.random() * (30000 - 15000 + 1)) + 15000;
         await sleep(randomNumber);
         // Kiểm tra số dư USDC trong tài khoản có lớn hơn 5 không
         console.log('userBalance', userBalance);
@@ -99,6 +99,9 @@ const sellOrder = async (client) => {
         console.log(getNowFormatDate(), "Bán thành công");
         successSell += 1;
         console.log(getNowFormatDate(), "Chi tiết đơn hàng:", `Giá bán:${orderResultAsk.price}, Số lượng bán:${orderResultAsk.quantity}, Mã đơn hàng:${orderResultAsk.id}`);
+        let randomNumber = Math.floor(Math.random() * (900000 - 60000 + 1)) + 60000;
+        console.log('Sleep', `${randomNumber}ms`);
+        await sleep(randomNumber);
         init(client);
     } else {
         console.log(getNowFormatDate(), "Bán thất bại");
@@ -137,6 +140,9 @@ const buyOrder = async (client) => {
         console.log(getNowFormatDate(), "Đặt hàng thành công");
         successBuy += 1;
         console.log(getNowFormatDate(), "Chi tiết đơn hàng:", `Giá mua:${orderResultBid.price}, Số lượng mua:${orderResultBid.quantity}, Mã đơn hàng:${orderResultBid.id}`);
+        let randomNumber = Math.floor(Math.random() * (900000 - 60000 + 1)) + 60000;
+        console.log('Sleep', `${randomNumber}ms`);
+        await sleep(randomNumber);
         init(client);
     } else {
         console.log(getNowFormatDate(), "Đặt hàng thất bại");
