@@ -84,7 +84,7 @@ const sellOrder = async (client) => {
     // Lấy giá hiện tại
     let { lastPrice: currentPrice } = await client.Ticker({ symbol: "SOL_USDC" });
     console.log(getNowFormatDate(), "Giá thị trường hiện tại của sol_usdc:", currentPrice);
-    let amount = ((userBalance2.SOL.available / 2) - 0.02).toFixed(2).toString();
+    let amount = ((userBalance2.SOL.available) - 0.05).toFixed(2).toString();
     console.log(getNowFormatDate(), `Đang bán... Bán ${amount} SOL`);
     let orderResultAsk = await client.ExecuteOrder({
         orderType: "Limit",
