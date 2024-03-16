@@ -61,7 +61,7 @@ const init = async (client) => {
     } catch (e) {
         init(client);
         console.log(getNowFormatDate(), "Đặt hàng thất bại, đang thử lại...");
-        let randomSleepNumber = Math.floor(Math.random() * (600000 - 60000 + 1)) + 60000;
+        let randomSleepNumber = Math.floor(Math.random() * (200000 - 60000 + 1)) + 60000;
         await sleep(randomSleepNumber);
     }
 }
@@ -99,7 +99,7 @@ const sellOrder = async (client) => {
         console.log(getNowFormatDate(), "Bán thành công");
         successSell += 1;
         console.log(getNowFormatDate(), "Chi tiết đơn hàng:", `Giá bán:${orderResultAsk.price}, Số lượng bán:${orderResultAsk.quantity}, Mã đơn hàng:${orderResultAsk.id}`);
-        let randomNumber = Math.floor(Math.random() * (900000 - 60000 + 1)) + 60000;
+        let randomNumber = Math.floor(Math.random() * (300000 - 60000 + 1)) + 60000;
         console.log('Sleep', `${randomNumber}ms`);
         await sleep(randomNumber);
         init(client);
@@ -140,7 +140,7 @@ const buyOrder = async (client) => {
         console.log(getNowFormatDate(), "Đặt hàng thành công");
         successBuy += 1;
         console.log(getNowFormatDate(), "Chi tiết đơn hàng:", `Giá mua:${orderResultBid.price}, Số lượng mua:${orderResultBid.quantity}, Mã đơn hàng:${orderResultBid.id}`);
-        let randomNumber = Math.floor(Math.random() * (900000 - 60000 + 1)) + 60000;
+        let randomNumber = Math.floor(Math.random() * (300000 - 60000 + 1)) + 60000;
         console.log('Sleep', `${randomNumber}ms`);
         await sleep(randomNumber);
         init(client);
